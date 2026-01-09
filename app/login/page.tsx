@@ -38,12 +38,12 @@ export default function LoginPage() {
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="text-center text-primary-foreground max-w-md">
             <blockquote className="text-2xl font-serif italic leading-relaxed">
-              &ldquo;Artistry has transformed how I connect with my audience. It&apos;s more than a platform—it&apos;s a
-              community.&rdquo;
+              &ldquo;Indus Valley has the vision to fuel the growth of the creative industry by empowering artists to become creative entreprreneurs!.&rdquo;&apos;
+
             </blockquote>
             <div className="mt-6">
-              <p className="font-semibold">Elena Rodriguez</p>
-              <p className="text-primary-foreground/70 text-sm">Painter & Sculptor, Barcelona</p>
+              <p className="font-semibold">Harsh Narayan</p>
+              <p className="text-primary-foreground/70 text-sm">Founder, Indus Valley Pvt Ltd</p>
             </div>
           </div>
         </div>

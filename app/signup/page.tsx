@@ -3,10 +3,13 @@ import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
 import { SignupForm } from "@/components/auth/signup-form"
 
+import { APP_NAME, APP_TAGLINE } from "@/lib/config"
+
 export const metadata: Metadata = {
-  title: "Sign Up - Indus Valley Pvt Ltd",
-  description: "Create your Indus Valley Pvt Ltd account",
+  title: APP_NAME,
+  description: APP_TAGLINE,
 }
+
 
 export default function SignupPage() {
   return (
