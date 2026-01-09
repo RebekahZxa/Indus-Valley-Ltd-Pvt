@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
-import { SignupForm } from "@/components/auth/signup-form"
+// import { SignupForm } from "@/components/auth/signup-form"
+import { AuthForm } from "@/components/auth/authForm"
 
 import { APP_NAME, APP_TAGLINE } from "@/lib/config"
 
@@ -54,7 +55,8 @@ export default function SignupPage() {
             <p className="mt-2 text-muted-foreground">Start your journey on Indus Valley Pvt Ltd</p>
           </div>
 
-          <SignupForm />
+          <AuthForm mode="signup" />
+
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Already have an account?{" "}

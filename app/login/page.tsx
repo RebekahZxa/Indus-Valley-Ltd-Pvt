@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
-import { LoginForm } from "@/components/auth/login-form"
+// import { LoginForm } from "@/components/auth/login-form"
+import { AuthForm } from "@/components/auth/authForm"
 
 export const metadata: Metadata = {
   title: "Log In - Indus Valley Pvt Ltd",
@@ -22,7 +23,8 @@ export default function LoginPage() {
             <p className="mt-2 text-muted-foreground">Log in to continue your artistic journey</p>
           </div>
 
-          <LoginForm />
+          <AuthForm mode="login" />
+
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
