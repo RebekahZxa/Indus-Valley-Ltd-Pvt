@@ -5,7 +5,7 @@ import { EventsListing } from "@/components/events/events-listing"
 import { EventsFilters } from "@/components/events/events-filters"
 
 export const metadata: Metadata = {
-  title: "Events - Artistry",
+  title: "Events - Indus Valley Pvt Ltd",
   description: "Discover exhibitions, performances, and premieres from artists worldwide",
 }
 

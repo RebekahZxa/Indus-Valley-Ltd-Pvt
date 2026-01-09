@@ -5,7 +5,7 @@ import { WorkshopsListing } from "@/components/workshops/workshops-listing"
 import { WorkshopsFilters } from "@/components/workshops/workshops-filters"
 
 export const metadata: Metadata = {
-  title: "Workshops - Artistry",
+  title: "Workshops - Indus Valley Pvt Ltd",
   description: "Learn from professional artists through workshops and masterclasses",
 }
 

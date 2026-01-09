@@ -6,7 +6,7 @@ import { DiscoveryFilters } from "@/components/discover/discovery-filters"
 import { DiscoverySearch } from "@/components/discover/discovery-search"
 
 export const metadata: Metadata = {
-  title: "Discover Artists - Artistry",
+  title: "Discover Artists - Indus Valley Pvt Ltd",
   description:
     "Explore talented filmmakers, musicians, painters, craftsmen, dancers, and artisans from around the world",
 }

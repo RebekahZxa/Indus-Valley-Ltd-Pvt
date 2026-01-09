@@ -4,8 +4,8 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { UserDashboardContent } from "@/components/dashboard/user-dashboard-content"
 
 export const metadata: Metadata = {
-  title: "Dashboard - Artistry",
-  description: "Manage your Artistry account",
+  title: "Dashboard - Indus Valley Pvt Ltd",
+  description: "Indus Valley Pvt Ltd",
 }
 
 export default function UserDashboardPage() {

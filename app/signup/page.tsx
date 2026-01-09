@@ -4,8 +4,8 @@ import { Logo } from "@/components/ui/logo"
 import { SignupForm } from "@/components/auth/signup-form"
 
 export const metadata: Metadata = {
-  title: "Sign Up - Artistry",
-  description: "Create your Artistry account",
+  title: "Sign Up - Indus Valley Pvt Ltd",
+  description: "Create your Indus Valley Pvt Ltd account",
 }
 
 export default function SignupPage() {
@@ -48,7 +48,7 @@ export default function SignupPage() {
               <Logo size="lg" />
             </Link>
             <h1 className="mt-6 font-serif text-3xl font-bold text-foreground">Create your account</h1>
-            <p className="mt-2 text-muted-foreground">Start your journey on Artistry</p>
+            <p className="mt-2 text-muted-foreground">Start your journey on Indus Valley Pvt Ltd</p>
           </div>
 
           <SignupForm />

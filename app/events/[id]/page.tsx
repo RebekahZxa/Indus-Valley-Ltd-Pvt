@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { mockEvents, mockArtists } from "@/lib/mock-data"
 
 export const metadata: Metadata = {
-  title: "Event Details - Artistry",
+  title: "Event Details - Indus Valley Pvt Ltd",
   description: "View event details and get tickets",
 }
 

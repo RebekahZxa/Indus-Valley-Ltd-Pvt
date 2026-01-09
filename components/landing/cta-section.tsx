@@ -12,7 +12,7 @@ export function CTASection() {
               Ready to Share Your Art with the World?
             </h2>
             <p className="text-primary-foreground/80 text-lg mb-8 leading-relaxed">
-              Join thousands of professional artists who trust Artistry to showcase their work, connect with audiences,
+              Join thousands of professional artists who trust Indus Valley Pvt Ltd to showcase their work, connect with audiences,
               and build their careers.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

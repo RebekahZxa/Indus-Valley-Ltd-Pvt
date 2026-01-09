@@ -4,7 +4,7 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { ArtistDashboardContent } from "@/components/dashboard/artist-dashboard-content"
 
 export const metadata: Metadata = {
-  title: "Artist Dashboard - Artistry",
+  title: "Artist Dashboard - Indus Valley Pvt Ltd",
   description: "Manage your artist profile, content, and earnings",
 }
 

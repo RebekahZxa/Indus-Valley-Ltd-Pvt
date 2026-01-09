@@ -4,8 +4,8 @@ import { Logo } from "@/components/ui/logo"
 import { LoginForm } from "@/components/auth/login-form"
 
 export const metadata: Metadata = {
-  title: "Log In - Artistry",
-  description: "Log in to your Artistry account",
+  title: "Log In - Indus Valley Pvt Ltd",
+  description: "Log in to your Indus Valley Pvt Ltd account",
 }
 
 export default function LoginPage() {

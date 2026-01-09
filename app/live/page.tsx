@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 export const metadata: Metadata = {
-  title: "Live - Artistry",
+  title: "Live - Indus Valley Pvt Ltd",
   description: "Watch live streams and premieres from artists",
 }
 
