@@ -1,9 +1,9 @@
-import type { Metadata } from "next"
+
 import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
 // import { SignupForm } from "@/components/auth/signup-form"
 import { AuthForm } from "@/components/auth/authForm"
-
+import type { Metadata } from "next"
 import { APP_NAME, APP_TAGLINE } from "@/lib/config"
 
 export const metadata: Metadata = {
@@ -56,6 +56,7 @@ export default function SignupPage() {
           </div>
 
           <AuthForm mode="signup" />
+          
 
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
