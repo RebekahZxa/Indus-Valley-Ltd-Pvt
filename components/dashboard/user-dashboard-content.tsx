@@ -2,80 +2,74 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { supabase } from "@/lib/supabase/client"
 
-export default function UserDashboardContent({
-  profile,
-  stats,
-}: {
+type Props = {
   profile: {
-    full_name?: string | null
-    username?: string | null
-    bio?: string | null
-    avatar_url?: string | null
+    full_name: string | null
+    username: string | null
+    bio: string | null
+    avatar_url: string | null
   }
   stats: {
-    following: number
     followers: number
+    following: number
     notifications: number
   }
-}) {
+}
+
+export default function UserDashboardContent({ profile, stats }: Props) {
+  const avatarUrl = profile.avatar_url
+    ? supabase.storage
+        .from("avatars")
+        .getPublicUrl(profile.avatar_url).data.publicUrl +
+      `?v=${Date.now()}`
+    : "/avatar-placeholder.png"
+
   return (
     <div className="space-y-8">
-      {/* HEADER */}
-      <div className="flex items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <Image
-            src={profile.avatar_url || "/avatar-placeholder.png"}
-            alt="Avatar"
-            width={72}
-            height={72}
-            className="rounded-full border object-cover"
-          />
+      {/* Profile header */}
+      <div className="flex items-center gap-6 rounded-2xl border bg-card p-6">
+        <Image
+          src={avatarUrl}
+          alt="Avatar"
+          width={96}
+          height={96}
+          unoptimized
+          className="rounded-full border"
+        />
 
-          <div>
-            <h1 className="text-2xl font-semibold">
-              {profile.full_name || "Your profile"}
-            </h1>
-            <p className="text-muted-foreground">
-              @{profile.username || "username"}
-            </p>
-          </div>
+        <div className="flex-1">
+          <h1 className="text-xl font-semibold">
+            {profile.full_name || "Unnamed User"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            @{profile.username || "username"}
+          </p>
+          <p className="mt-2 text-sm">{profile.bio}</p>
         </div>
 
-        {/* ✏️ EDIT PROFILE */}
         <Link href="/dashboard/profile">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Pencil size={14} />
-            Edit profile
-          </Button>
+          <Button>Edit profile</Button>
         </Link>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Stat label="Following" value={stats.following} />
-        <Stat label="Followers" value={stats.followers} />
-        <Stat label="Unread notifications" value={stats.notifications} />
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <StatCard label="Followers" value={stats.followers} />
+        <StatCard label="Following" value={stats.following} />
+        <StatCard label="Unread" value={stats.notifications} />
       </div>
-
-      {/* BIO */}
-      <section className="rounded-xl border bg-card p-6">
-        <h2 className="font-medium mb-2">About</h2>
-        <p className="text-muted-foreground leading-relaxed">
-          {profile.bio || "You haven’t added a bio yet."}
-        </p>
-      </section>
     </div>
   )
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border bg-card p-5">
+    <div className="rounded-xl border bg-card p-4 text-center">
+      <p className="text-2xl font-bold">{value}</p>
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="text-2xl font-semibold">{value}</p>
     </div>
   )
 }
