@@ -124,7 +124,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border">
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} Artistry. All rights reserved.
+            © {new Date().getFullYear()} Indus Valley Digital. All rights reserved.
           </p>
         </div>
       </div>

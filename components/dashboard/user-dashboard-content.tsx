@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -70,6 +72,15 @@ function StatCard({ label, value }: { label: string; value: number }) {
     <div className="rounded-xl border bg-card p-4 text-center">
       <p className="text-2xl font-bold">{value}</p>
       <p className="text-sm text-muted-foreground">{label}</p>
+    </div>
+  )
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl border bg-card p-5">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="text-2xl font-semibold">{value}</p>
     </div>
   )
 }

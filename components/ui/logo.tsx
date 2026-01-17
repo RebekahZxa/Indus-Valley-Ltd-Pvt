@@ -13,6 +13,6 @@ export function Logo({ className, size = "md" }: LogoProps) {
   }
 
   return (
-    <span className={cn("font-serif font-bold tracking-tight text-primary", sizes[size], className)}>Indus Valley Pvt. Ltd</span>
+    <span className={cn("font-serif font-bold tracking-tight text-primary", sizes[size], className)}>Indus Valley Digital</span>
   )
 }

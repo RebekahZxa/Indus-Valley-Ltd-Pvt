@@ -4,14 +4,14 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
 
 export const metadata: Metadata = {
-  title: "Admin Panel - Artistry",
+  title: "Admin Panel - Indus Valley Digital",
   description: "Platform administration and moderation",
 }
 
 export default function AdminPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header isLoggedIn />
+      <Header />
       <div className="flex-1 flex">
         <AdminSidebar />
         <main className="flex-1 p-6 lg:p-8 overflow-auto">

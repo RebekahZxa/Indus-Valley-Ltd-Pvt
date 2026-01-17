@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   Music,
   Film,
@@ -13,12 +12,16 @@ import {
   PenTool,
   Shirt,
   MapPin,
-  Calendar,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { cn } from "@/lib/utils"
 
 const artForms = [
@@ -34,35 +37,50 @@ const artForms = [
   { id: "fashion", label: "Fashion", icon: Shirt },
 ]
 
-const regions = ["North America", "Europe", "Asia", "Africa", "South America", "Oceania"]
+const regions = [
+  "India",
+  "North America",
+  "Europe",
+  "Asia",
+  "Africa",
+  "South America",
+  "Oceania",
+]
 
-interface DiscoveryFiltersProps {
+type DiscoveryFiltersProps = {
+  categories: string[]
+  regions: string[]
+  onChangeCategories: (values: string[]) => void
+  onChangeRegions: (values: string[]) => void
+  onClear: () => void
   onApply?: () => void
 }
 
-export function DiscoveryFilters({ onApply }: DiscoveryFiltersProps) {
-  const [selectedArtForms, setSelectedArtForms] = useState<string[]>([])
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([])
-  const [hasEvents, setHasEvents] = useState(false)
-  const [hasWorkshops, setHasWorkshops] = useState(false)
-
-  const toggleArtForm = (id: string) => {
-    setSelectedArtForms((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]))
+export function DiscoveryFilters({
+  categories,
+  regions: selectedRegions,
+  onChangeCategories,
+  onChangeRegions,
+  onClear,
+  onApply,
+}: DiscoveryFiltersProps) {
+  const toggleCategory = (id: string) => {
+    onChangeCategories(
+      categories.includes(id)
+        ? categories.filter((c) => c !== id)
+        : [...categories, id],
+    )
   }
 
   const toggleRegion = (region: string) => {
-    setSelectedRegions((prev) => (prev.includes(region) ? prev.filter((r) => r !== region) : [...prev, region]))
+    onChangeRegions(
+      selectedRegions.includes(region)
+        ? selectedRegions.filter((r) => r !== region)
+        : [...selectedRegions, region],
+    )
   }
 
-  const clearFilters = () => {
-    setSelectedArtForms([])
-    setSelectedRegions([])
-    setHasEvents(false)
-    setHasWorkshops(false)
-  }
-
-  const activeFiltersCount =
-    selectedArtForms.length + selectedRegions.length + (hasEvents ? 1 : 0) + (hasWorkshops ? 1 : 0)
+  const activeFiltersCount = categories.length + selectedRegions.length
 
   return (
     <div className="space-y-6">
@@ -71,15 +89,16 @@ export function DiscoveryFilters({ onApply }: DiscoveryFiltersProps) {
           <span className="text-sm text-muted-foreground">
             {activeFiltersCount} filter{activeFiltersCount !== 1 ? "s" : ""} active
           </span>
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
+          <Button variant="ghost" size="sm" onClick={onClear}>
             Clear all
           </Button>
         </div>
       )}
 
-      <Accordion type="multiple" defaultValue={["art-forms", "regions"]} className="space-y-4">
+      <Accordion type="multiple" defaultValue={["art-forms", "regions"]}>
+        {/* Art Forms */}
         <AccordionItem value="art-forms" className="border rounded-lg px-4">
-          <AccordionTrigger className="hover:no-underline">
+          <AccordionTrigger>
             <span className="font-medium">Art Forms</span>
           </AccordionTrigger>
           <AccordionContent>
@@ -87,15 +106,15 @@ export function DiscoveryFilters({ onApply }: DiscoveryFiltersProps) {
               {artForms.map((form) => (
                 <div key={form.id} className="flex items-center space-x-3">
                   <Checkbox
-                    id={`art-${form.id}`}
-                    checked={selectedArtForms.includes(form.id)}
-                    onCheckedChange={() => toggleArtForm(form.id)}
+                    checked={categories.includes(form.id)}
+                    onCheckedChange={() => toggleCategory(form.id)}
                   />
                   <Label
-                    htmlFor={`art-${form.id}`}
                     className={cn(
-                      "flex items-center gap-2 cursor-pointer text-sm font-normal",
-                      selectedArtForms.includes(form.id) ? "text-foreground" : "text-muted-foreground",
+                      "flex items-center gap-2 text-sm cursor-pointer",
+                      categories.includes(form.id)
+                        ? "text-foreground"
+                        : "text-muted-foreground",
                     )}
                   >
                     <form.icon className="h-4 w-4" />
@@ -107,8 +126,9 @@ export function DiscoveryFilters({ onApply }: DiscoveryFiltersProps) {
           </AccordionContent>
         </AccordionItem>
 
+        {/* Regions */}
         <AccordionItem value="regions" className="border rounded-lg px-4">
-          <AccordionTrigger className="hover:no-underline">
+          <AccordionTrigger>
             <span className="font-medium flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Regions
@@ -119,15 +139,15 @@ export function DiscoveryFilters({ onApply }: DiscoveryFiltersProps) {
               {regions.map((region) => (
                 <div key={region} className="flex items-center space-x-3">
                   <Checkbox
-                    id={`region-${region}`}
                     checked={selectedRegions.includes(region)}
                     onCheckedChange={() => toggleRegion(region)}
                   />
                   <Label
-                    htmlFor={`region-${region}`}
                     className={cn(
-                      "cursor-pointer text-sm font-normal",
-                      selectedRegions.includes(region) ? "text-foreground" : "text-muted-foreground",
+                      "text-sm cursor-pointer",
+                      selectedRegions.includes(region)
+                        ? "text-foreground"
+                        : "text-muted-foreground",
                     )}
                   >
                     {region}
@@ -137,55 +157,13 @@ export function DiscoveryFilters({ onApply }: DiscoveryFiltersProps) {
             </div>
           </AccordionContent>
         </AccordionItem>
-
-        <AccordionItem value="availability" className="border rounded-lg px-4">
-          <AccordionTrigger className="hover:no-underline">
-            <span className="font-medium flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Availability
-            </span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="has-events"
-                  checked={hasEvents}
-                  onCheckedChange={(checked) => setHasEvents(checked as boolean)}
-                />
-                <Label
-                  htmlFor="has-events"
-                  className={cn(
-                    "cursor-pointer text-sm font-normal",
-                    hasEvents ? "text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  Has upcoming events
-                </Label>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="has-workshops"
-                  checked={hasWorkshops}
-                  onCheckedChange={(checked) => setHasWorkshops(checked as boolean)}
-                />
-                <Label
-                  htmlFor="has-workshops"
-                  className={cn(
-                    "cursor-pointer text-sm font-normal",
-                    hasWorkshops ? "text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  Offers workshops
-                </Label>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
       </Accordion>
 
       {onApply && (
-        <Button onClick={onApply} className="w-full gradient-primary text-primary-foreground">
+        <Button
+          onClick={onApply}
+          className="w-full gradient-primary text-primary-foreground"
+        >
           Apply Filters
         </Button>
       )}

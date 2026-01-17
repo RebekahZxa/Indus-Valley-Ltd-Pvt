@@ -21,7 +21,7 @@ export default function SignupPage() {
           <div className="text-center text-primary-foreground max-w-md">
             <h2 className="text-3xl font-serif font-bold mb-4">Join the Community</h2>
             <p className="text-primary-foreground/80 leading-relaxed">
-              Whether you&apos;re a filmmaker, musician, painter, craftsman, dancer, or artisan — Artistry is your space
+              Whether you&apos;re a filmmaker, musician, painter, craftsman, dancer, or artisan — Indus Valley Digital is your space
               to shine.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-4 text-center">
@@ -52,7 +52,7 @@ export default function SignupPage() {
               <Logo size="lg" />
             </Link>
             <h1 className="mt-6 font-serif text-3xl font-bold text-foreground">Create your account</h1>
-            <p className="mt-2 text-muted-foreground">Start your journey on Indus Valley Pvt Ltd</p>
+            <p className="mt-2 text-muted-foreground">Start your journey on Indus Valley Digital</p>
           </div>
 
           <AuthForm mode="signup" />

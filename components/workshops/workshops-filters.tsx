@@ -1,50 +1,38 @@
 "use client"
 
-import { useState } from "react"
-import { Clock, Users, Star, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 
-const artForms = ["All", "Painting", "Music", "Dance", "Film", "Crafts", "Photography"]
-const levels = ["All Levels", "Beginner", "Intermediate", "Advanced"]
+const CATEGORIES = [
+  { label: "All", value: null },
+  { label: "Painting", value: "painting" },
+  { label: "Music", value: "music" },
+  { label: "Dance", value: "dance" },
+  { label: "Film", value: "film" },
+  { label: "Crafts", value: "crafts" },
+  { label: "Photography", value: "photography" },
+]
 
-export function WorkshopsFilters() {
-  const [selectedArtForm, setSelectedArtForm] = useState("All")
-
+export function WorkshopsFilters({
+  category,
+  onChangeCategory,
+  onClear,
+}: any) {
   return (
-    <div className="mb-8 space-y-4">
-      <div className="flex flex-wrap gap-2">
-        {artForms.map((form) => (
-          <Button
-            key={form}
-            variant={selectedArtForm === form ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedArtForm(form)}
-            className={cn(selectedArtForm === form && "gradient-primary text-primary-foreground", "bg-transparent")}
-          >
-            {form}
-          </Button>
-        ))}
-      </div>
+    
+    <div className="flex flex-wrap gap-3 mb-6">
+      {CATEGORIES.map((c) => (
+        <Button
+          key={c.label}
+          variant={category === c.value ? "default" : "outline"}
+          onClick={() => onChangeCategory(c.value)}
+        >
+          {c.label}
+        </Button>
+      ))}
 
-      <div className="flex flex-wrap gap-4">
-        <Button variant="outline" className="bg-transparent">
-          <Clock className="h-4 w-4 mr-2" />
-          Any Duration
-        </Button>
-        <Button variant="outline" className="bg-transparent">
-          <Users className="h-4 w-4 mr-2" />
-          All Levels
-        </Button>
-        <Button variant="outline" className="bg-transparent">
-          <Star className="h-4 w-4 mr-2" />
-          4+ Rating
-        </Button>
-        <Button variant="outline" className="bg-transparent">
-          <Filter className="h-4 w-4 mr-2" />
-          More Filters
-        </Button>
-      </div>
+      <Button variant="ghost" size="sm" onClick={onClear}>
+        Clear all
+      </Button>
     </div>
   )
 }

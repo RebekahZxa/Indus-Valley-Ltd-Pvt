@@ -6,7 +6,7 @@ import { ArtistDashboardContent } from "@/components/dashboard/artist-dashboard-
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Artist Dashboard - Indus Valley Pvt Ltd",
+  title: "Artist Dashboard - Indus Valley Digital",
   description: "Manage your artist profile, content, and earnings",
 }
 

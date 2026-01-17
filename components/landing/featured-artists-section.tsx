@@ -1,19 +1,57 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ArtistCard } from "@/components/ui/artist-card"
-import { mockArtists } from "@/lib/mock-data"
+import { supabase } from "@/lib/supabase/client"
+
+type FeaturedArtist = {
+  id: string
+  category: string | null
+  profiles: {
+    full_name: string | null
+    avatar_url: string | null
+  }[]
+}
 
 export function FeaturedArtistsSection() {
-  const featuredArtists = mockArtists.slice(0, 4)
+  const [artists, setArtists] = useState<FeaturedArtist[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase
+      .from("artists")
+      .select(`
+        id,
+        category,
+        profiles:profile_id (
+          full_name,
+          avatar_url
+        )
+      `)
+      .eq("verified", true)
+      .limit(4)
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setArtists(data)
+        }
+        setLoading(false)
+      })
+  }, [])
 
   return (
     <section className="py-16 md:py-24 bg-muted/50">
       <div className="container mx-auto px-4">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2 text-balance">Featured Artists</h2>
-            <p className="text-muted-foreground">Discover talented creators from around the world</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2 text-balance">
+              Featured Artists
+            </h2>
+            <p className="text-muted-foreground">
+              Discover talented creators from around the world
+            </p>
           </div>
           <Link href="/discover">
             <Button variant="ghost" className="group">
@@ -23,11 +61,27 @@ export function FeaturedArtistsSection() {
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredArtists.map((artist) => (
-            <ArtistCard key={artist.id} artist={artist} />
-          ))}
-        </div>
+        {loading ? (
+          <p className="text-muted-foreground">Loading artists…</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {artists.map((artist) => {
+              const profile = artist.profiles[0]
+
+              return (
+                <ArtistCard
+                  key={artist.id}
+                  artist={{
+                    id: artist.id,
+                    name: profile?.full_name ?? "Unknown Artist",
+                    avatar: profile?.avatar_url ?? null,
+                    artForms: artist.category ? [artist.category] : [],
+                  }}
+                />
+              )
+            })}
+          </div>
+        )}
       </div>
     </section>
   )

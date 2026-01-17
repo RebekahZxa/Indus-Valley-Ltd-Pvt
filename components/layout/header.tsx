@@ -1,21 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, Search, Bell, User } from "lucide-react"
+import { Menu, X, Bell, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/ui/logo"
 import { cn } from "@/lib/utils"
+import { supabase } from "@/lib/supabase/client"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 interface HeaderProps {
   variant?: "default" | "transparent"
   showAuth?: boolean
-  showSearch?: boolean
-  isLoggedIn?: boolean
 }
 
-export function Header({ variant = "default", showAuth = true, showSearch = false, isLoggedIn = false }: HeaderProps) {
+export function Header({
+  variant = "default",
+  showAuth = true,
+}: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
 
   const navLinks = [
     { href: "/discover", label: "Discover" },
@@ -24,15 +28,41 @@ export function Header({ variant = "default", showAuth = true, showSearch = fals
     { href: "/live", label: "Live" },
   ]
 
+  /* ================= AUTH STATE ================= */
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  /* ================= LOGOUT HANDLER ================= */
+  const handleLogout = async () => {
+    const confirmed = window.confirm("Are you sure you want to log out?")
+    if (!confirmed) return
+    await supabase.auth.signOut()
+  }
+
+  /* ================= UI ================= */
   return (
     <header
       className={cn(
         "sticky top-0 z-50 w-full transition-colors",
-        variant === "default" ? "bg-card/95 backdrop-blur-sm border-b border-border" : "bg-transparent",
+        variant === "default"
+          ? "bg-card/95 backdrop-blur-sm border-b border-border"
+          : "bg-transparent",
       )}
     >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
+          {/* Left */}
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center">
               <Logo />
@@ -51,25 +81,42 @@ export function Header({ variant = "default", showAuth = true, showSearch = fals
             </nav>
           </div>
 
+          {/* Right */}
           <div className="flex items-center gap-3">
-            {showSearch && (
-              <Button variant="ghost" size="icon" className="hidden sm:flex" aria-label="Search">
-                <Search className="h-5 w-5" />
-              </Button>
-            )}
-
-            {isLoggedIn ? (
+            {/* LOGGED IN */}
+            {user ? (
               <>
-                <Button variant="ghost" size="icon" aria-label="Notifications">
-                  <Bell className="h-5 w-5" />
-                </Button>
+                {/* Notifications */}
+                <Link href="/notifications">
+                  <Button variant="ghost" size="icon" aria-label="Notifications">
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                </Link>
+
+                {/* Profile */}
                 <Link href="/dashboard">
-                  <Button variant="ghost" size="icon" aria-label="Profile" className="rounded-full">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Profile"
+                    className="rounded-full"
+                  >
                     <User className="h-5 w-5" />
                   </Button>
                 </Link>
+
+                {/* Logout */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Logout"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
               </>
             ) : (
+              /* LOGGED OUT */
               showAuth && (
                 <div className="hidden sm:flex items-center gap-2">
                   <Link href="/login">
@@ -86,6 +133,7 @@ export function Header({ variant = "default", showAuth = true, showSearch = fals
               )
             )}
 
+            {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="icon"
@@ -98,6 +146,7 @@ export function Header({ variant = "default", showAuth = true, showSearch = fals
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-2">
@@ -111,7 +160,8 @@ export function Header({ variant = "default", showAuth = true, showSearch = fals
                   {link.label}
                 </Link>
               ))}
-              {!isLoggedIn && showAuth && (
+
+              {!user && showAuth && (
                 <div className="flex flex-col gap-2 mt-4 px-4">
                   <Link href="/login">
                     <Button variant="outline" className="w-full bg-transparent">
@@ -119,8 +169,27 @@ export function Header({ variant = "default", showAuth = true, showSearch = fals
                     </Button>
                   </Link>
                   <Link href="/signup">
-                    <Button className="w-full gradient-primary text-primary-foreground">Join Now</Button>
+                    <Button className="w-full gradient-primary text-primary-foreground">
+                      Join Now
+                    </Button>
                   </Link>
+                </div>
+              )}
+
+              {user && (
+                <div className="flex flex-col gap-2 mt-4 px-4">
+                  <Link href="/dashboard">
+                    <Button variant="outline" className="w-full bg-transparent">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    className="w-full bg-transparent"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
                 </div>
               )}
             </div>

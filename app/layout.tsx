@@ -15,7 +15,7 @@
 // })
 
 // export const metadata: Metadata = {
-//   title: "Artistry - The Professional Platform for Artists",
+//   title: "Indus Valley Digital - The Professional Platform for Artists",
 //   description:
 //     "Connect, showcase, and grow your artistic career. The professional platform for filmmakers, musicians, painters, craftsmen, dancers, and artisans.",
 //   generator: "v0.app",

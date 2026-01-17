@@ -1,123 +1,124 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Loader2 } from "lucide-react"
-import { ArtistCard } from "@/components/ui/artist-card"
-import { mockArtists } from "@/lib/mock-data"
-import type { Artist } from "@/components/ui/artist-card"
+import { useEffect, useState } from "react"
+import { fetchArtists } from "@/lib/db/public"
 
-// Extend mock data for infinite scroll demonstration
-const extendedArtists: Artist[] = [
-  ...mockArtists,
-  {
-    id: "9",
-    name: "Ana Martinez",
-    image: "/female-muralist-street-art-painting.jpg",
-    artForms: ["Muralist", "Street Artist"],
-    region: "Mexico City, Mexico",
-    followers: 8200,
-    isVerified: true,
-  },
-  {
-    id: "10",
-    name: "Raj Sharma",
-    image: "/male-musician-sitar-classical-indian.jpg",
-    artForms: ["Musician", "Sitar Player"],
-    region: "Delhi, India",
-    followers: 4500,
-    isVerified: false,
-  },
-  {
-    id: "11",
-    name: "Ingrid Larsen",
-    image: "/female-glassblower-artisan-craft.jpg",
-    artForms: ["Glassblower", "Artisan"],
-    region: "Copenhagen, Denmark",
-    followers: 3800,
-    isVerified: true,
-  },
-  {
-    id: "12",
-    name: "Chen Wei",
-    image: "/male-traditional-chinese-painter.jpg",
-    artForms: ["Painter", "Calligrapher"],
-    region: "Beijing, China",
-    followers: 12000,
-    isVerified: true,
-  },
-]
+type ArtistProfile = {
+  id: string
+  full_name: string | null
+  username: string | null
+  avatar_url: string | null
+}
 
-export function DiscoveryGrid() {
-  const [artists, setArtists] = useState<Artist[]>(extendedArtists.slice(0, 8))
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasMore, setHasMore] = useState(true)
+type Artist = {
+  id: string
+  category: string | null
+  location: string | null
+  verified: boolean
+  profiles: ArtistProfile[]
+}
 
-  const loadMore = async () => {
-    if (isLoading || !hasMore) return
+type DiscoveryGridProps = {
+  search?: string
+  categories?: string[]
+  region?: string
+}
 
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+export function DiscoveryGrid({
+  search = "",
+  categories = [],
+  region,
+}: DiscoveryGridProps) {
+  const [artists, setArtists] = useState<Artist[]>([])
+  const [loading, setLoading] = useState(true)
 
-    const currentLength = artists.length
-    const nextArtists = extendedArtists.slice(currentLength, currentLength + 4)
+  useEffect(() => {
+    setLoading(true)
 
-    if (nextArtists.length === 0) {
-      setHasMore(false)
-    } else {
-      setArtists((prev) => [...prev, ...nextArtists])
-    }
+    fetchArtists().then(({ data, error }) => {
+      if (error || !data) {
+        console.error("Error fetching artists:", error)
+        setArtists([])
+        setLoading(false)
+        return
+      }
 
-    setIsLoading(false)
+      let results = data as Artist[]
+
+      /* 🔍 SEARCH FILTER */
+      if (search.trim() !== "") {
+        const q = search.toLowerCase()
+        results = results.filter((artist) => {
+          const profile = artist.profiles[0]
+          return (
+            profile?.full_name?.toLowerCase().includes(q) ||
+            artist.category?.toLowerCase().includes(q) ||
+            artist.location?.toLowerCase().includes(q)
+          )
+        })
+      }
+
+      /* 🎨 CATEGORY FILTER */
+      if (categories.length > 0) {
+        results = results.filter((artist) =>
+          categories.includes(artist.category ?? "")
+        )
+      }
+
+      /* 🌍 REGION FILTER */
+      if (region) {
+        results = results.filter(
+          (artist) =>
+            artist.location?.toLowerCase() === region.toLowerCase()
+        )
+      }
+
+      setArtists(results)
+      setLoading(false)
+    })
+  }, [search, categories, region])
+
+  if (loading) {
+    return <p className="text-muted-foreground">Loading artists...</p>
   }
 
-  // Infinite scroll observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          loadMore()
-        }
-      },
-      { threshold: 0.1 },
-    )
-
-    const sentinel = document.getElementById("scroll-sentinel")
-    if (sentinel) {
-      observer.observe(sentinel)
-    }
-
-    return () => observer.disconnect()
-  }, [hasMore, isLoading])
-
-  // Pinterest-style masonry with varying heights
-  const getRandomHeight = (index: number) => {
-    const heights = ["h-64", "h-72", "h-80", "h-64", "h-72"]
-    return heights[index % heights.length]
+  if (artists.length === 0) {
+    return <p className="text-muted-foreground">No artists found.</p>
   }
 
   return (
-    <div>
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-        {artists.map((artist, index) => (
-          <div key={artist.id} className="break-inside-avoid">
-            <ArtistCard artist={artist} className={getRandomHeight(index)} />
-          </div>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {artists.map((artist) => {
+        const profile = artist.profiles[0]
 
-      {/* Scroll sentinel for infinite loading */}
-      <div id="scroll-sentinel" className="h-20 flex items-center justify-center mt-8">
-        {isLoading && (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Loading more artists...</span>
+        return (
+          <div
+            key={artist.id}
+            className="rounded-lg border bg-card p-4 hover:shadow-md transition"
+          >
+            <img
+              src={profile?.avatar_url || "/placeholder-avatar.png"}
+              alt={profile?.full_name || "Artist"}
+              className="h-48 w-full object-cover rounded-md mb-4"
+            />
+
+            <h3 className="font-semibold text-lg">
+              {profile?.full_name || "Unknown Artist"}
+            </h3>
+
+            <p className="text-sm text-muted-foreground">
+              {artist.category ?? "Uncategorized"} •{" "}
+              {artist.location ?? "Unknown location"}
+            </p>
+
+            {artist.verified && (
+              <span className="inline-block mt-2 text-xs text-green-600 font-medium">
+                ✔ Verified
+              </span>
+            )}
           </div>
-        )}
-        {!hasMore && artists.length > 0 && (
-          <p className="text-muted-foreground text-sm">You&apos;ve seen all artists</p>
-        )}
-      </div>
+        )
+      })}
     </div>
   )
 }

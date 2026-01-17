@@ -11,7 +11,7 @@ import { ArtistMonetization } from "@/components/artist/artist-monetization"
 import { mockArtists } from "@/lib/mock-data"
 
 export const metadata: Metadata = {
-  title: "Artist Profile - Indus Valley Pvt Ltd",
+  title: "Artist Profile - Indus Valley Digital",
   description: "View artist portfolio, exhibitions, events, and workshops",
 }
 
