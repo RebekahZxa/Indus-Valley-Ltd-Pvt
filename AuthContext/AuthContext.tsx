@@ -7,72 +7,30 @@ import type { User } from "@supabase/supabase-js"
 type AuthContextType = {
   user: User | null
   loading: boolean
-  onboardingCompleted: boolean | null
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  onboardingCompleted: null,
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [onboardingCompleted, setOnboardingCompleted] =
-    useState<boolean | null>(null)
 
   useEffect(() => {
-    const loadSessionAndProfile = async () => {
-      setLoading(true)
-
-      const { data } = await supabase.auth.getSession()
-      const sessionUser = data.session?.user ?? null
-
-      setUser(sessionUser)
-
-      // Only check onboarding for artists
-      if (sessionUser?.user_metadata?.role === "artist") {
-        const { data: artist, error } = await supabase
-          .from("artists")
-          .select("onboarding_completed")
-          .eq("profile_id", sessionUser.id)
-          .single()
-
-        if (!error && artist) {
-          setOnboardingCompleted(artist.onboarding_completed)
-        } else {
-          // Artist exists but onboarding not done or row missing
-          setOnboardingCompleted(false)
-        }
-      } else {
-        setOnboardingCompleted(null)
-      }
-
+    // Initial session fetch
+    supabase.auth.getSession().then(({ data }) => {
+      console.log("AuthContext: initial session", data.session?.user ?? null)
+      setUser(data.session?.user ?? null)
       setLoading(false)
-    }
-
-    loadSessionAndProfile()
+    })
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const sessionUser = session?.user ?? null
-      setUser(sessionUser)
-
-      if (sessionUser?.user_metadata?.role === "artist") {
-        supabase
-          .from("artists")
-          .select("onboarding_completed")
-          .eq("profile_id", sessionUser.id)
-          .single()
-          .then(({ data }) => {
-            setOnboardingCompleted(data?.onboarding_completed ?? false)
-          })
-      } else {
-        setOnboardingCompleted(null)
-      }
-
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("AuthContext: auth change", event, session?.user ?? null)
+      setUser(session?.user ?? null)
       setLoading(false)
     })
 
@@ -80,9 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider
-      value={{ user, loading, onboardingCompleted }}
-    >
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   )

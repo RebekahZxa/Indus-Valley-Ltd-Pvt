@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageCropper, type CropData } from "@/components/ImageCropper"
+import { Upload } from "lucide-react"
+import { ArtistPostCreator } from "@/components/artist/ArtistPostCreator"
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -17,6 +20,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false)
   const [avatarPath, setAvatarPath] = useState<string | null>(null)
   const [avatarVersion, setAvatarVersion] = useState(Date.now())
+  const [showCropper, setShowCropper] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     full_name: "",
@@ -44,11 +49,25 @@ export default function ProfilePage() {
       })
   }, [user])
 
-  // 🔹 Upload avatar
-  async function handleAvatarUpload(file: File) {
+  // 🔹 Handle avatar file selection - show cropper
+  async function handleAvatarSelect(file: File) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setSelectedImage(e.target?.result as string)
+      setShowCropper(true)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // 🔹 Handle crop completion
+  async function handleCropComplete(croppedImageBlob: Blob, cropData: CropData) {
     if (!user) return
 
-    const ext = file.name.split(".").pop()
+    // Create a file from blob
+    const file = new File([croppedImageBlob], `avatar_${user.id}_cropped.png`, { type: "image/png" })
+    
+    // Upload to storage
+    const ext = "png"
     const filePath = `avatars/${user.id}.${ext}`
 
     await supabase.storage
@@ -58,14 +77,16 @@ export default function ProfilePage() {
         cacheControl: "0",
       })
 
-    // save ONLY path
+    // Save path to profiles
     await supabase
       .from("profiles")
       .update({ avatar_url: filePath })
       .eq("id", user.id)
 
     setAvatarPath(filePath)
-    setAvatarVersion(Date.now()) // 🔥 bust cache
+    setAvatarVersion(Date.now())
+    setShowCropper(false)
+    setSelectedImage(null)
   }
 
   // 🔹 Save profile
@@ -103,24 +124,47 @@ export default function ProfilePage() {
         </div>
 
         <div className="rounded-2xl border bg-card p-8 space-y-8">
-          {/* Avatar */}
-          <div className="flex items-center gap-6">
-            <Image
-              src={avatarUrl}
-              alt="Avatar"
-              width={96}
-              height={96}
-              unoptimized
-              className="rounded-full border object-cover"
-            />
+          {/* Avatar - Circular Display */}
+          <div className="flex flex-col items-center gap-6">
+            {/* Circular Profile Photo */}
+            <div className="relative shrink-0 cursor-pointer group">
+              <Image
+                src={avatarUrl}
+                alt="Avatar"
+                width={128}
+                height={128}
+                unoptimized
+                className="h-32 w-32 rounded-full border-4 border-pink-400 object-cover"
+                priority
+              />
+              
+              {/* Upload overlay on hover */}
+              <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100">
+                <Upload className="text-white h-6 w-6" />
+              </div>
+            </div>
 
+            {/* File input */}
             <input
               type="file"
               accept="image/*"
-              onChange={(e) =>
-                e.target.files && handleAvatarUpload(e.target.files[0])
-              }
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleAvatarSelect(e.target.files[0])
+                }
+              }}
+              className="hidden"
+              id="avatar-upload"
             />
+            <label htmlFor="avatar-upload">
+              <Button asChild variant="outline" className="cursor-pointer">
+                <span>Change Photo</span>
+              </Button>
+            </label>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Click "Change Photo" to upload and crop your profile picture in a circle
+            </p>
           </div>
 
           {/* Form */}
@@ -167,6 +211,20 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Artist post creator removed from shared profile page to prevent user access */}
+
+      {/* Image Cropper Modal */}
+      {showCropper && selectedImage && (
+        <ImageCropper
+          imageSrc={selectedImage}
+          onCropComplete={handleCropComplete}
+          onCancel={() => {
+            setShowCropper(false)
+            setSelectedImage(null)
+          }}
+        />
+      )}
     </div>
   )
 }

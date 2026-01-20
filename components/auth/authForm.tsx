@@ -251,8 +251,24 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
       if (error) throw error
 
-      // IMPORTANT: hard navigation so cookies flush
-      window.location.assign("/dashboard")
+      // IMPORTANT: write server-side cookies so server can read session on next requests
+      try {
+        const session = await supabase.auth.getSession()
+        const access = session.data.session?.access_token
+        const refresh = session.data.session?.refresh_token
+        if (access && refresh) {
+          await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_token: access, refresh_token: refresh }),
+          })
+        }
+      } catch (e) {
+        console.warn('Could not persist session to server', e)
+      }
+
+      // Navigate after server-side cookie is set
+      window.location.assign('/dashboard')
 
     } catch (err: any) {
       setError(err?.message ?? "Authentication failed")

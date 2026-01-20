@@ -37,10 +37,30 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
 
+  let role: string | null = null
   if (code) {
     const supabase = await createSupabaseServerClient()
     await supabase.auth.exchangeCodeForSession(code)
+    // Fetch user and role
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single()
+      role = profile?.role || null
+    }
   }
 
-  return NextResponse.redirect(new URL("/dashboard", request.url))
+  let redirectPath = "/login"
+  if (role === "artist") {
+    redirectPath = "/dashboard/artist"
+  } else if (role === "user") {
+    redirectPath = "/dashboard/user"
+  }
+
+  return NextResponse.redirect(new URL(redirectPath, request.url))
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { MapPin, Instagram, Twitter, Globe, Share2, Settings, Users, ImageIcon, Award } from "lucide-react"
+import { MapPin, Instagram, Twitter, Globe, Share2, Settings, Users, ImageIcon, Award, ZoomIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Artist } from "@/components/ui/artist-card"
@@ -27,36 +27,52 @@ interface ArtistProfileHeaderProps {
 
 export function ArtistProfileHeader({ artist, isOwner = false }: ArtistProfileHeaderProps) {
   const [isFollowing, setIsFollowing] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   return (
-    <div className="relative">
-      {/* Cover Image */}
-      <div className="h-48 md:h-64 lg:h-80 relative overflow-hidden">
-        <div className="absolute inset-0 gradient-primary opacity-80" />
-        <div className="absolute inset-0 bg-[url('/artist-cover-pattern.svg')] opacity-10" />
-      </div>
+    <>
+      <div className="relative">
+        {/* Cover Image */}
+        <div className="h-48 md:h-64 lg:h-80 relative overflow-hidden">
+          <div className="absolute inset-0 gradient-primary opacity-80" />
+          <div className="absolute inset-0 bg-[url('/artist-cover-pattern.svg')] opacity-10" />
+        </div>
 
-      {/* Profile Content */}
-      <div className="container mx-auto px-4">
-        <div className="relative -mt-20 md:-mt-24 pb-6">
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            {/* Avatar */}
-            <div className="relative">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background shadow-lg">
-                <Image src={artist.image || "/placeholder.svg"} alt={artist.name} fill className="object-cover" />
-              </div>
-              {artist.isVerified && (
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full gradient-primary flex items-center justify-center border-2 border-background">
-                  <svg className="w-4 h-4 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+        {/* Profile Content */}
+        <div className="container mx-auto px-4">
+          <div className="relative -mt-20 md:-mt-24 pb-6">
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              {/* Avatar - Circular Instagram Style */}
+              <div 
+                className="relative cursor-pointer group shrink-0"
+                onClick={() => setShowModal(true)}
+              >
+                <Image 
+                  src={artist.image || "/placeholder.svg"} 
+                  alt={artist.name} 
+                  width={160} 
+                  height={160} 
+                  className="h-40 w-40 rounded-full border-4 border-pink-400 object-cover"
+                  priority
+                />
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 flex items-center justify-center border-4 border-pink-400">
+                  <ZoomIn className="text-white h-6 w-6" />
                 </div>
-              )}
-            </div>
+
+                {artist.isVerified && (
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full gradient-primary flex items-center justify-center border-2 border-background">
+                    <svg className="w-4 h-4 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
@@ -132,6 +148,7 @@ export function ArtistProfileHeader({ artist, isOwner = false }: ArtistProfileHe
                   </div>
                 </div>
               )}
+            </div>
 
               {/* Social Links */}
               {artist.socialLinks && (
@@ -169,6 +186,57 @@ export function ArtistProfileHeader({ artist, isOwner = false }: ArtistProfileHe
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Full Profile Photo Modal */}
+      {showModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer"
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            className="relative max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl"
+            >
+              ✕
+            </button>
+
+            {/* Circular photo container */}
+            <Image
+              src={artist.image || "/placeholder.svg"}
+              alt={artist.name}
+              width={288}
+              height={288}
+              className="h-72 w-72 rounded-full border-4 border-pink-400 object-cover"
+              priority
+            />
+            </div>
+
+            {/* Profile info below photo */}
+            <div className="mt-6 text-center text-white">
+              <div className="flex items-center justify-center gap-2">
+                <h3 className="text-xl font-semibold">
+                  {artist.name}
+                </h3>
+                {artist.isVerified && (
+                  <Badge variant="secondary" className="text-xs">
+                    Verified
+                  </Badge>
+                )}
+              </div>
+              {artist.bio && (
+                <p className="text-sm text-gray-200 mt-3">
+                  {artist.bio}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

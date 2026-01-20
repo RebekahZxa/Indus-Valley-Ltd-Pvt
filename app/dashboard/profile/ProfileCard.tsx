@@ -2,9 +2,11 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 
 export function ProfileCard({ profile }: { profile: any }) {
+  const router = useRouter()
   return (
     <div className="flex items-center gap-6 rounded-xl border bg-card p-6">
       <Image
@@ -30,9 +32,11 @@ export function ProfileCard({ profile }: { profile: any }) {
         )}
       </div>
 
-      <Link href="/dashboard/profile">
-        <Button>Edit profile</Button>
-      </Link>
+      <div className="flex flex-col gap-2">
+        <Link href="/dashboard/profile">
+          <Button>Edit profile</Button>
+        </Link>
+      </div>
     </div>
   )
 }
