@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase" // ✅ FIXED IMPORT
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/AuthContext/AuthContext"
 
@@ -17,44 +17,38 @@ export default function FollowButton({ targetUserId }: FollowButtonProps) {
   useEffect(() => {
     if (!user) return
 
-    async function checkFollow() {
-      const { data } = await supabase
-        .from("follows")
-        .select("follower_id")
-        .eq("follower_id", user.id)
-        .eq("following_id", targetUserId)
-        .maybeSingle()
+    const checkFollow = async () => {
+      const { data, error } = await supabase.rpc("is_following", {
+        p_user: user.id,
+        p_vendor: targetUserId,
+      })
 
-      setIsFollowing(!!data)
+      if (!error) setIsFollowing(data === true)
     }
 
     checkFollow()
   }, [user, targetUserId])
 
-  async function toggleFollow() {
-    if (!user) return
+  const toggleFollow = async () => {
+    if (!user || isFollowing === null) return
     setLoading(true)
 
     if (isFollowing) {
-      await supabase
-        .from("follows")
-        .delete()
-        .eq("follower_id", user.id)
-        .eq("following_id", targetUserId)
-    } else {
-      await supabase.from("follows").insert({
-        follower_id: user.id,
-        following_id: targetUserId,
+      await supabase.rpc("unfollow_vendor", {
+        p_vendor: targetUserId,
       })
+      setIsFollowing(false)
+    } else {
+      await supabase.rpc("follow_vendor", {
+        p_vendor: targetUserId,
+      })
+      setIsFollowing(true)
     }
 
-    setIsFollowing(!isFollowing)
     setLoading(false)
   }
 
-  if (!user || user.id === targetUserId || isFollowing === null) {
-    return null
-  }
+  if (!user || user.id === targetUserId || isFollowing === null) return null
 
   return (
     <Button
